@@ -7,45 +7,13 @@ import (
 	"net/http"
 )
 
-type Address struct {
-	Street string
-	HouseNumber int
-}
-
-type User struct {
-	Address
-	Name string
-	Age int
-	Skills []string
-	Dog string
-	Location map[string] float64
-}
-
 func home(w http.ResponseWriter, r *http.Request)   {
 	w.Header().Set("Content-Type", "text/html")
 	t, err := template.ParseFiles("views/home.gohtml")
 	if err != nil{
 	    panic(err)
 	}
-	data := User{
-		Name:    "Thiago",
-		Age:     30,
-		Address: Address{
-			Street: "Okerstrasse",
-			HouseNumber: 35,
-		},
-		Skills: []string{
-			"PHP",
-			"MySQL",
-			"Leadership",
-		},
-		Dog:     "Odin",
-		Location: map[string]float64{
-			"Latitude": 64.123,
-			"Longitude": 123.23333,
-		},
-	}
-	err = t.Execute(w, data)
+	err = t.Execute(w, struct {}{})
 	if err != nil{
 	    panic(err)
 	}
