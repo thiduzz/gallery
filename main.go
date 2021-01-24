@@ -25,10 +25,11 @@ func notFound(w http.ResponseWriter, r *http.Request)  {
 func main() {
 	router := mux.NewRouter()
 	usersController := controllers.NewUsers()
-	router.HandleFunc("/", home)
-	router.HandleFunc("/contact", contact)
-	router.HandleFunc("/signup", usersController.New)
-	router.HandleFunc("/login", usersController.Index)
+	router.HandleFunc("/", home).Methods(http.MethodGet)
+	router.HandleFunc("/contact", contact).Methods(http.MethodGet)
+	router.HandleFunc("/signup", usersController.New).Methods(http.MethodGet)
+	router.HandleFunc("/signup", usersController.Store).Methods(http.MethodPost)
+	router.HandleFunc("/login", usersController.Index).Methods(http.MethodGet)
 	router.NotFoundHandler = http.HandlerFunc(notFound)
 	http.ListenAndServe(":3000",router)
 }

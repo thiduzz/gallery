@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/thiduzz/lenslocked.com/views"
 	"net/http"
 )
@@ -25,6 +26,6 @@ func (c *Users) New(w http.ResponseWriter, r *http.Request)  {
 	c.NewView.Render(w, nil)
 }
 
-func (c Users) store(w http.ResponseWriter, r *http.Request)  {
-
+func (c Users) Store(w http.ResponseWriter, r *http.Request)  {
+	fmt.Fprintln(w, "Created successfully")
 }
