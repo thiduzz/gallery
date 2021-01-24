@@ -3,30 +3,17 @@ package main
 import (
 	"fmt"
 	"github.com/gorilla/mux"
-	"html/template"
+	"github.com/thiduzz/lenslocked.com/controllers"
+	"github.com/thiduzz/lenslocked.com/views"
 	"net/http"
 )
 
 func home(w http.ResponseWriter, r *http.Request)   {
-	w.Header().Set("Content-Type", "text/html")
-	t, err := template.ParseFiles("views/home.gohtml")
-	if err != nil{
-	    panic(err)
-	}
-	err = t.Execute(w, struct {}{})
-	if err != nil{
-	    panic(err)
-	}
+	must(views.NewView("master", "views/home.gohtml").Render(w,nil))
 }
 
 func contact(w http.ResponseWriter, r *http.Request)   {
-	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprint(w, "To get in touch, send an email to <a href=\"mailto:support@lenslocked.com\">Support Lenslocked.com</a>")
-}
-
-func faq(w http.ResponseWriter, r *http.Request)   {
-	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprint(w, "<h1>FAQ Page</h1>")
+	must(views.NewView("master", "views/contact.gohtml").Render(w, nil))
 }
 
 func notFound(w http.ResponseWriter, r *http.Request)  {
@@ -37,9 +24,17 @@ func notFound(w http.ResponseWriter, r *http.Request)  {
 
 func main() {
 	router := mux.NewRouter()
+	usersController := controllers.NewUsers()
 	router.HandleFunc("/", home)
 	router.HandleFunc("/contact", contact)
-	router.HandleFunc("/faq", faq)
+	router.HandleFunc("/signup", usersController.New)
+	router.HandleFunc("/login", usersController.Index)
 	router.NotFoundHandler = http.HandlerFunc(notFound)
 	http.ListenAndServe(":3000",router)
+}
+
+func must(err error)  {
+	if err != nil{
+	    panic(err)
+	}
 }
