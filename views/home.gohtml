@@ -1,0 +1,10 @@
+<h1>Hello, {{.Name}}. How is your dog {{.Dog}}?</h1>
+<p>So you are {{.Age}} and live in {{.Address.Street}} {{.Address.HouseNumber}} ?</p>
+<h3>Skills:</h3>
+<ul>
+    {{range $index, $element := .Skills}}<li>{{$element}}</li> {{end}}
+</ul>
+<h3>Location:</h3>
+<ul>
+    {{range $index, $element := .Location}}<li>{{$index}}:{{$element}}</li> {{end}}
+</ul>
