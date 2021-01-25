@@ -1,0 +1,14 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres
+    container_name: pg.lenslocked.local
+    restart: always
+    ports:
+      - "5434:5432"
+    env_file:
+      - .env
+    volumes:
+      - ./.docker/postgresql/setup.sh:/docker-entrypoint-initdb.d/initdb.sh
+      - ./.docker/postgresql/data:/var/lib/postgresql/data
