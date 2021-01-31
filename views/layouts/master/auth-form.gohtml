@@ -1,9 +1,17 @@
 {{define "authForm"}}
-    <form class="flex flex-col" method="POST" action="/signup">
+    <form class="flex flex-col"
+            {{ if (eq . "create") }}
+            method="POST" action="/signup"
+            {{ else if (eq . "login") }}
+            method="POST" action="/login"
+            {{end}}
+    >
+        {{ if (eq . "create") }}
         <div class="mb-6 pt-3 rounded bg-gray-200">
             <label class="block text-gray-700 text-sm font-bold mb-2 ml-3" for="email">Name</label>
             <input type="text" id="name" name="name" class="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-purple-600 transition duration-500 px-3 pb-3">
         </div>
+        {{end}}
         <div class="mb-6 pt-3 rounded bg-gray-200">
             <label class="block text-gray-700 text-sm font-bold mb-2 ml-3" for="email">Email</label>
             <input type="text" id="email" name="email" class="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-purple-600 transition duration-500 px-3 pb-3">
@@ -12,6 +20,10 @@
             <label class="block text-gray-700 text-sm font-bold mb-2 ml-3" for="password">Password</label>
             <input type="password" id="password" name="password" class="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-purple-600 transition duration-500 px-3 pb-3">
         </div>
+        {{ if (eq . "create") }}
         <button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded shadow-lg hover:shadow-xl transition duration-200" type="submit">Register</button>
+        {{ else if (eq . "login") }}
+        <button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded shadow-lg hover:shadow-xl transition duration-200" type="submit">Login</button>
+        {{end}}
     </form>
 {{end}}

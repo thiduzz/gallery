@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -9,11 +10,17 @@ import (
 
 var ErrNotFound = errors.New("models: resource not found")
 var ErrInvalidID = errors.New("models: user ID is invalid")
+var ErrInvalidPasswordHash = errors.New("models: invalid password hash")
+var ErrInvalidPassword = errors.New("models: invalid password")
+const userPasswordPepper = "secret-random-string"
+
 
 type User struct {
 	gorm.Model
 	Name  string `gorm:"not null;"`
-	Email string `gorm:"uniqueIndex:idx_email_unique,not null;"`
+	Email string `gorm:"uniqueIndex:idx_email_unique;not null"`
+	Password string `gorm:"-"`
+	PasswordHash string `gorm:"not null"`
 }
 
 func NewUserService(connectionInfo string) (*UserService, error)  {
@@ -37,6 +44,12 @@ type UserService struct{
 // Create will create the provided user and backfill data like
 // the ID, CreatedAt and UpdatedAt fields
 func (u *UserService) Create(user *User) error {
+	passwordBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password + userPasswordPepper), bcrypt.DefaultCost)
+	if err != nil{
+	    return ErrInvalidPasswordHash
+	}
+	user.PasswordHash = string(passwordBytes)
+	user.Password = ""
 	return u.db.Create(user).Error
 }
 
@@ -73,6 +86,23 @@ func (u *UserService) ByEmail(email string) (*User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+// Authenticate can be used to authenticate a user into the application with a email and password
+func (u *UserService) Authenticate(email string, password string) (*User, error) {
+	foundUser, err := u.ByEmail(email)
+	if err != nil{
+	    return nil, err
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(foundUser.PasswordHash), []byte(password + userPasswordPepper))
+	switch err {
+	case bcrypt.ErrMismatchedHashAndPassword:
+		return nil, ErrInvalidPassword
+	case nil:
+	default:
+		return nil, err
+	}
+	return foundUser, nil
 }
 
 func first(db *gorm.DB, dst interface{}) error {
