@@ -3,17 +3,15 @@ package models
 import (
 	"errors"
 	"github.com/thiduzz/lenslocked.com/hash"
-	"github.com/thiduzz/lenslocked.com/rand"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 var ErrNotFound = errors.New("models: resource not found")
 var ErrInvalidID = errors.New("models: user ID is invalid")
 var ErrInvalidPasswordHash = errors.New("models: invalid password hash")
 var ErrInvalidPassword = errors.New("models: invalid password")
+
 const userPasswordPepper = "secret-random-string"
 const hmacSecretKey = "secret-hmac-key"
 
@@ -27,97 +25,33 @@ type User struct {
 	RememberHash string `gorm:"not_null;uniqueIndex"`
 }
 
-func NewUserService(connectionInfo string) (*UserService, error)  {
-	db, err := gorm.Open(postgres.Open(connectionInfo), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
+type UserService interface {
+	Authenticate(email string, password string) (*User, error)
+	UserRepository
+}
+
+type userService struct {
+	UserRepository
+}
+
+var _ UserService = &userService{}
+
+func NewUserService(connectionInfo string) (UserService, error)  {
+	ug, err := NewUserGorm(connectionInfo)
 	if err != nil{
-		return nil, err
+	    panic(err)
 	}
-	//db.Migrator().DropTable(&User{})
-	db.AutoMigrate(&User{})
-	return &UserService{
-		db: db,
-		hmac: hash.NewHMAC(hmacSecretKey),
+	return &userService{
+		UserRepository: &userValidator{
+			UserRepository: ug,
+			hmac: hash.NewHMAC(hmacSecretKey),
+		},
 	}, nil
 }
 
-type UserService struct{
-	db *gorm.DB
-	hmac hash.HMAC
-}
-
-// Create will create the provided user and backfill data like
-// the ID, CreatedAt and UpdatedAt fields
-func (u *UserService) Create(user *User) error {
-	passwordBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password + userPasswordPepper), bcrypt.DefaultCost)
-	if err != nil{
-	    return ErrInvalidPasswordHash
-	}
-	user.PasswordHash = string(passwordBytes)
-	user.Password = ""
-	if user.Remember == ""{
-		token, err := rand.RememberToken()
-		if err != nil{
-		    return err
-		}
-		user.Remember = token
-	}
-	user.RememberHash = u.hmac.Hash(user.Remember)
-	return u.db.Create(user).Error
-}
-
-// Update will update the provided user will all of the date in
-// the provided user object
-func (u *UserService) Update(user *User) error {
-	if user.Remember != ""{
-		user.RememberHash = u.hmac.Hash(user.Remember)
-	}
-	return u.db.Save(user).Error
-}
-
-
-// Destroy will softdelete the provided user object from the database
-func (u *UserService) Destroy(id uint) error {
-	if id == 0 {
-		return ErrInvalidID
-	}
-	return u.db.Delete(&User{}, id).Error
-}
-
-// ByID will look up by the id provided
-func (u *UserService) ByID(id uint) (*User, error) {
-	var user User
-	db := u.db.Where("id = ?", id)
-	if err := first(db, &user); err != nil {
-		return nil, err
-	}
-	return &user, nil
-}
-
-// ByEmail will look up by the email provided
-func (u *UserService) ByEmail(email string) (*User, error) {
-	var user User
-	db := u.db.Where("email = ?", email)
-	if err := first(db, &user); err != nil {
-		return nil, err
-	}
-	return &user, nil
-}
-
-// ByRemember will look up by the email provided
-func (u *UserService) ByRemember(token string) (*User, error) {
-	var user User
-	rememberHash := u.hmac.Hash(token)
-	db := u.db.Where("remember_hash = ?", rememberHash)
-	if err := first(db, &user); err != nil {
-		return nil, err
-	}
-	return &user, nil
-}
 
 // Authenticate can be used to authenticate a user into the application with a email and password
-func (u *UserService) Authenticate(email string, password string) (*User, error) {
+func (u *userService) Authenticate(email string, password string) (*User, error) {
 	foundUser, err := u.ByEmail(email)
 	if err != nil{
 	    return nil, err
@@ -131,12 +65,4 @@ func (u *UserService) Authenticate(email string, password string) (*User, error)
 		return nil, err
 	}
 	return foundUser, nil
-}
-
-func first(db *gorm.DB, dst interface{}) error {
-	err := db.First(dst).Error
-	if err == gorm.ErrRecordNotFound{
-		return ErrNotFound
-	}
-	return err
 }

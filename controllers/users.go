@@ -12,7 +12,7 @@ type Users struct {
 	IndexView *views.View
 	CreateView *views.View
 	ShowView *views.View
-	service	*models.UserService
+	service	models.UserService
 }
 
 type RegistrationForm struct {
@@ -26,7 +26,7 @@ type LoginForm struct {
 	Password string `schema:"password,required"`
 }
 
-func NewUsers(us *models.UserService) *Users {
+func NewUsers(us models.UserService) *Users {
 	return &Users{
 		IndexView: views.NewView("master", "users/index"),
 		CreateView: views.NewView("master", "users/create"),
