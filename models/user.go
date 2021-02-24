@@ -2,6 +2,8 @@ package models
 
 import (
 	"errors"
+	"github.com/thiduzz/lenslocked.com/hash"
+	"github.com/thiduzz/lenslocked.com/rand"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -13,7 +15,7 @@ var ErrInvalidID = errors.New("models: user ID is invalid")
 var ErrInvalidPasswordHash = errors.New("models: invalid password hash")
 var ErrInvalidPassword = errors.New("models: invalid password")
 const userPasswordPepper = "secret-random-string"
-
+const hmacSecretKey = "secret-hmac-key"
 
 type User struct {
 	gorm.Model
@@ -21,6 +23,8 @@ type User struct {
 	Email string `gorm:"uniqueIndex:idx_email_unique;not null"`
 	Password string `gorm:"-"`
 	PasswordHash string `gorm:"not null"`
+	Remember string `gorm:"-"`
+	RememberHash string `gorm:"not_null;uniqueIndex"`
 }
 
 func NewUserService(connectionInfo string) (*UserService, error)  {
@@ -34,11 +38,13 @@ func NewUserService(connectionInfo string) (*UserService, error)  {
 	db.AutoMigrate(&User{})
 	return &UserService{
 		db: db,
+		hmac: hash.NewHMAC(hmacSecretKey),
 	}, nil
 }
 
 type UserService struct{
 	db *gorm.DB
+	hmac hash.HMAC
 }
 
 // Create will create the provided user and backfill data like
@@ -50,12 +56,23 @@ func (u *UserService) Create(user *User) error {
 	}
 	user.PasswordHash = string(passwordBytes)
 	user.Password = ""
+	if user.Remember == ""{
+		token, err := rand.RememberToken()
+		if err != nil{
+		    return err
+		}
+		user.Remember = token
+	}
+	user.RememberHash = u.hmac.Hash(user.Remember)
 	return u.db.Create(user).Error
 }
 
 // Update will update the provided user will all of the date in
 // the provided user object
 func (u *UserService) Update(user *User) error {
+	if user.Remember != ""{
+		user.RememberHash = u.hmac.Hash(user.Remember)
+	}
 	return u.db.Save(user).Error
 }
 
@@ -82,6 +99,17 @@ func (u *UserService) ByID(id uint) (*User, error) {
 func (u *UserService) ByEmail(email string) (*User, error) {
 	var user User
 	db := u.db.Where("email = ?", email)
+	if err := first(db, &user); err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+// ByRemember will look up by the email provided
+func (u *UserService) ByRemember(token string) (*User, error) {
+	var user User
+	rememberHash := u.hmac.Hash(token)
+	db := u.db.Where("remember_hash = ?", rememberHash)
 	if err := first(db, &user); err != nil {
 		return nil, err
 	}

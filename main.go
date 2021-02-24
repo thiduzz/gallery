@@ -31,6 +31,7 @@ func main() {
 	router.HandleFunc("/signup", usersController.Store).Methods(http.MethodPost)
 	router.HandleFunc("/login", usersController.Index).Methods(http.MethodGet)
 	router.HandleFunc("/login", usersController.Login).Methods(http.MethodPost)
+	router.HandleFunc("/profile", usersController.Show).Methods(http.MethodGet)
 	router.NotFoundHandler = http.HandlerFunc(staticController.NotFound)
 	http.ListenAndServe(":3000",router)
 }
