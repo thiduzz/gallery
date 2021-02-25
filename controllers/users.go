@@ -17,13 +17,13 @@ type Users struct {
 
 type RegistrationForm struct {
 	Name string `schema:"name"`
-	Email string `schema:"email,required"`
-	Password string `schema:"password,required"`
+	Email string `schema:"email"`
+	Password string `schema:"password"`
 }
 
 type LoginForm struct {
-	Email string `schema:"email,required"`
-	Password string `schema:"password,required"`
+	Email string `schema:"email"`
+	Password string `schema:"password"`
 }
 
 func NewUsers(us models.UserService) *Users {
