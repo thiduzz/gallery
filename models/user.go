@@ -30,14 +30,11 @@ type userService struct {
 
 var _ UserService = &userService{}
 
-func NewUserService(connectionInfo string) (UserService, error)  {
-	ug, err := NewUserGorm(connectionInfo)
-	if err != nil{
-	    panic(err)
-	}
+func NewUserService(db *gorm.DB) UserService  {
+	ug :=  &userGorm{db: db}
 	return &userService{
 		UserRepository: newUserValidator(ug, hash.NewHMAC(hmacSecretKey)),
-	}, nil
+	}
 }
 
 

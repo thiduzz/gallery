@@ -19,12 +19,16 @@ const (
 func main() {
 	router := mux.NewRouter()
 	psqlInfo := fmt.Sprintf("host=%s port=%d password=%s user=%s dbname=%s sslmode=disable", host, port, password, user, dbname)
-	userService, err := models.NewUserService(psqlInfo)
-	if err != nil{
+	services, err := models.NewServices(psqlInfo)
+	if err != nil {
 	    panic(err)
 	}
+	err = services.AutoMigrate()
+	if err != nil {
+		panic(err)
+	}
 	staticController := controllers.NewStatic()
-	usersController := controllers.NewUsers(userService)
+	usersController := controllers.NewUsers(services.User)
 	router.Handle("/", staticController.Home).Methods(http.MethodGet)
 	router.Handle("/contact", staticController.Contact).Methods(http.MethodGet)
 	router.HandleFunc("/signup", usersController.Create).Methods(http.MethodGet)

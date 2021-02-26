@@ -1,10 +1,7 @@
 package models
 
 import (
-	"github.com/thiduzz/lenslocked.com/hash"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 type UserRepository interface {
@@ -15,29 +12,13 @@ type UserRepository interface {
 	Store(user *User) error
 	Update(user *User) error
 	Destroy(id uint) error
-
-	AutoMigrate() error
 }
 
 var _ UserRepository = &userGorm{}
 
 type userGorm struct {
 	db *gorm.DB
-	hmac hash.HMAC
 	BaseRepository
-}
-
-func NewUserGorm(connectionInfo string) (*userGorm, error)  {
-	db, err := gorm.Open(postgres.Open(connectionInfo), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
-	if err != nil{
-		return nil, err
-	}
-	//db.Migrator().DropTable(&User{})
-	return &userGorm{
-		db: db,
-	}, nil
 }
 
 // Create will create the provided user and backfill data like
@@ -86,11 +67,4 @@ func (ug *userGorm) ByRemember(rememberHash string) (*User, error) {
 		return nil, err
 	}
 	return &user, nil
-}
-
-func (ug *userGorm) AutoMigrate() error {
-	if err := ug.db.AutoMigrate(&User{}); err != nil {
-		return err
-	}
-	return nil
 }
