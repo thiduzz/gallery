@@ -19,7 +19,6 @@ func NewServices(connectionInfo string) (*Services, error) {
 	if err != nil{
 		return nil, err
 	}
-	//db.Migrator().DropTable(&User{})
 	return &Services{
 		User:    NewUserService(db),
 		Gallery: NewGalleryService(db),
