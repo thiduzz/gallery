@@ -12,7 +12,7 @@ type UserRepository interface {
 	ByEmail(email string) (*User, error)
 	ByRemember(token string) (*User, error)
 
-	Create(user *User) error
+	Store(user *User) error
 	Update(user *User) error
 	Destroy(id uint) error
 
@@ -42,7 +42,7 @@ func NewUserGorm(connectionInfo string) (*userGorm, error)  {
 
 // Create will create the provided user and backfill data like
 // the ID, CreatedAt and UpdatedAt fields
-func (ug *userGorm) Create(user *User) error {
+func (ug *userGorm) Store(user *User) error {
 	return ug.db.Create(user).Error
 }
 

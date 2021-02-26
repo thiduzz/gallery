@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/thiduzz/lenslocked.com/models"
 	"github.com/thiduzz/lenslocked.com/rand"
 	"github.com/thiduzz/lenslocked.com/views"
+	"log"
 	"net/http"
 )
 
@@ -40,6 +40,7 @@ func (c *Users) Index(w http.ResponseWriter, r *http.Request)  {
 }
 
 func (c *Users) Create(w http.ResponseWriter, r *http.Request)  {
+
 	c.CreateView.Render(w, nil)
 }
 
@@ -53,47 +54,60 @@ func (c *Users) Show(w http.ResponseWriter, r *http.Request)  {
 }
 
 func (c *Users) Login(w http.ResponseWriter, r *http.Request) {
+	var vd views.Data
 	var form LoginForm
 	if err := parseForm(r, &form); err != nil{
-		panic(err)
+		log.Print(err)
+		vd.SetAlert(err)
+		c.IndexView.Render(w,vd)
+		return
 	}
 	user, err := c.service.Authenticate(form.Email, form.Password)
 	if err != nil{
 		switch err {
 		case models.ErrNotFound:
-			fmt.Fprintln(w, "Invalid email address.")
-		case models.ErrInvalidPassword:
-			fmt.Fprintln(w, "Invalid password.")
+			vd.SetAlertError("Invalid email address")
 		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			vd.SetAlert(err)
 		}
+		c.IndexView.Render(w, vd)
+		return
 	}
 
 	err = c.signIn(w, user)
 	if err != nil{
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		vd.SetAlert(err)
+		c.IndexView.Render(w, vd)
+		return
 	}
 	http.Redirect(w, r,"/profile", http.StatusFound)
 }
 
 func (c Users) Store(w http.ResponseWriter, r *http.Request)  {
+	var vd views.Data
 	var form RegistrationForm
 	if err := parseForm(r, &form); err != nil{
-		panic(err)
+		log.Print(err)
+		vd.SetAlert(err)
+		c.CreateView.Render(w,vd)
+		return
 	}
 	user := models.User{
 		Name:  form.Name,
 		Email: form.Email,
 		Password: form.Password,
 	}
-	err := c.service.Create(&user)
+	err := c.service.Store(&user)
 	if err != nil{
-	    http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Println(err)
+		vd.SetAlert(err)
+		c.CreateView.Render(w,vd)
 	    return
 	}
 	err = c.signIn(w, &user)
 	if err != nil{
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Println(err.Error())
+		http.Redirect(w, r,"/login", http.StatusFound)
 	}
 	http.Redirect(w, r,"/profile", http.StatusFound)
 }

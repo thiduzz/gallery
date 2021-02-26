@@ -1,26 +1,9 @@
 package models
 
 import (
-	"errors"
 	"github.com/thiduzz/lenslocked.com/hash"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-)
-
-var (
-	ErrNotFound = errors.New("models: resource not found")
-	ErrInvalidID = errors.New("models: user ID is invalid")
-
-	ErrInvalidEmail = errors.New("Email address is invalid")
-	ErrRequiredEmail = errors.New("Email address is required")
-	ErrAlreadyTaken = errors.New("models: email address is already taken")
-
-	ErrRequiredPassword = errors.New("Password is required")
-	ErrInvalidPasswordHash = errors.New("models: invalid password hash")
-	ErrInvalidPassword = errors.New("models: invalid password")
-
-	ErrRememberTooShort = errors.New("models: invalid remember token")
-	ErrRequiredRememberHash = errors.New("models: remember has in required")
 )
 
 const userPasswordPepper = "secret-random-string"

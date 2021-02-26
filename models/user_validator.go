@@ -57,7 +57,7 @@ func (uv *userValidator) ByEmail(email string) (*User, error) {
 	return uv.UserRepository.ByEmail(user.Email)
 }
 
-func (uv *userValidator) Create(user *User) error {
+func (uv *userValidator) Store(user *User) error {
 	if err := validateUserRules(user,
 		uv.passwordRequire,
 		uv.passwordMinLength(8),
@@ -76,7 +76,7 @@ func (uv *userValidator) Create(user *User) error {
 	); err != nil {
 		return err
 	}
-	return uv.UserRepository.Create(user)
+	return uv.UserRepository.Store(user)
 }
 
 func (uv *userValidator) Update(user *User) error {
@@ -179,7 +179,7 @@ func (uv *userValidator) passwordHashRequire(user *User) error {
 func (uv *userValidator) passwordMinLength(n uint) userValidationRule {
 	return userValidationRule(func(user *User) error {
 		if len(user.Password) < int(n){
-			return errors.New(fmt.Sprintf("Password needs to be at least %d characters",n))
+			return modelError(fmt.Sprintf("Password needs to be at least %d characters",n))
 		}
 		return nil
 	})

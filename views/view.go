@@ -1,8 +1,10 @@
 package views
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
+	"io"
 	"net/http"
 	"path/filepath"
 )
@@ -29,12 +31,23 @@ func NewView(layout string, files ...string) *View {
 	return &View{Template: t, Layout: layout}
 }
 
-func (v *View) Render(w http.ResponseWriter, data interface{}) error {
+func (v *View) Render(w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "text/html")
-	if err := v.Template.ExecuteTemplate(w, v.Layout, data); err != nil {
-		return err
+
+	switch data.(type) {
+	case Data:
+	default:
+		data = Data{
+			Alert: nil,
+			Yield: data,
+		}
 	}
-	return nil
+	var bf bytes.Buffer
+	if err := v.Template.ExecuteTemplate(&bf, v.Layout, data); err != nil {
+		http.Error(w, "Something went wrong, contact the admins...", http.StatusInternalServerError)
+		return
+	}
+	io.Copy(w, &bf)
 }
 
 func (v *View) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
