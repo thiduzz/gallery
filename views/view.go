@@ -24,6 +24,7 @@ func NewView(layout string, files ...string) *View {
 	addTemplatePath(files)
 	addTemplateExt(files)
 	files = append(files, layoutFiles(layout)...)
+	files = append(files, componentFiles(layout)...)
 	t, err := template.ParseFiles(files...)
 	if err != nil {
 		panic(err)
@@ -56,6 +57,14 @@ func (v *View) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 
 func layoutFiles(layout string) []string {
+	files, err := filepath.Glob(fmt.Sprintf("%s/%s/*%s",LayoutDir,layout, TemplateExt))
+	if err != nil{
+		panic(err)
+	}
+	return files
+}
+
+func componentFiles(layout string) []string {
 	files, err := filepath.Glob(fmt.Sprintf("%s/%s/*%s",LayoutDir,layout, TemplateExt))
 	if err != nil{
 		panic(err)

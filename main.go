@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/thiduzz/lenslocked.com/controllers"
+	"github.com/thiduzz/lenslocked.com/middleware"
 	"github.com/thiduzz/lenslocked.com/models"
 	"net/http"
 )
@@ -27,8 +28,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	authenticatedMiddleware := middleware.Authenticated{UserService:services.User}
 	staticController := controllers.NewStatic()
 	usersController := controllers.NewUsers(services.User)
+	galleriesController := controllers.NewGalleries(services.Gallery)
 	router.Handle("/", staticController.Home).Methods(http.MethodGet)
 	router.Handle("/contact", staticController.Contact).Methods(http.MethodGet)
 	router.HandleFunc("/signup", usersController.Create).Methods(http.MethodGet)
@@ -36,6 +40,11 @@ func main() {
 	router.HandleFunc("/login", usersController.Index).Methods(http.MethodGet)
 	router.HandleFunc("/login", usersController.Login).Methods(http.MethodPost)
 	router.HandleFunc("/profile", usersController.Show).Methods(http.MethodGet)
+
+	//Galleries
+	router.HandleFunc("/galleries/create", authenticatedMiddleware.HandleFn(galleriesController.Create)).Methods(http.MethodGet)
+	router.HandleFunc("/galleries", authenticatedMiddleware.HandleFn(galleriesController.Store)).Methods(http.MethodPost)
+
 	router.NotFoundHandler = http.HandlerFunc(staticController.NotFound)
 	http.ListenAndServe(":3000",router)
 }
