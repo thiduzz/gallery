@@ -32,7 +32,7 @@ func main() {
 	authenticatedMiddleware := middleware.Authenticated{UserService:services.User}
 	staticController := controllers.NewStatic()
 	usersController := controllers.NewUsers(services.User)
-	galleriesController := controllers.NewGalleries(services.Gallery)
+	galleriesController := controllers.NewGalleries(services.Gallery, router)
 	router.Handle("/", staticController.Home).Methods(http.MethodGet)
 	router.Handle("/contact", staticController.Contact).Methods(http.MethodGet)
 	router.HandleFunc("/signup", usersController.Create).Methods(http.MethodGet)
@@ -42,8 +42,9 @@ func main() {
 	router.HandleFunc("/profile", usersController.Show).Methods(http.MethodGet)
 
 	//Galleries
-	router.HandleFunc("/galleries/create", authenticatedMiddleware.HandleFn(galleriesController.Create)).Methods(http.MethodGet)
-	router.HandleFunc("/galleries", authenticatedMiddleware.HandleFn(galleriesController.Store)).Methods(http.MethodPost)
+	router.HandleFunc("/galleries/create", authenticatedMiddleware.HandleFn(galleriesController.Create)).Methods(http.MethodGet).Name("gallery.create")
+	router.HandleFunc("/galleries/{id:[0-9]+}", galleriesController.Show).Methods(http.MethodGet).Name("gallery.show")
+	router.HandleFunc("/galleries", authenticatedMiddleware.HandleFn(galleriesController.Store)).Methods(http.MethodPost).Name("gallery.store")
 
 	router.NotFoundHandler = http.HandlerFunc(staticController.NotFound)
 	http.ListenAndServe(":3000",router)
