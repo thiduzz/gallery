@@ -4,6 +4,7 @@ import "gorm.io/gorm"
 
 type GalleryRepository interface {
 	Store(gallery *Gallery) error
+	Update(gallery *Gallery) error
 	ByID(id uint) (*Gallery, error)
 }
 

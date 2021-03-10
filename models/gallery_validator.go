@@ -36,6 +36,18 @@ func (gv *galleryValidator) Store(gallery *Gallery) error {
 	return gv.GalleryRepository.Store(gallery)
 }
 
+
+func (gv *galleryValidator) Update(gallery *Gallery) error {
+	if err := validateGalleryRules(gallery,
+		gv.titleRequire,
+		gv.titleMinLength(3),
+		gv.userIDRequired,
+	); err != nil {
+		return err
+	}
+	return gv.GalleryRepository.Update(gallery)
+}
+
 func (gv *galleryValidator) titleRequire(gallery *Gallery) error {
 	if gallery.Title == ""{
 		return ErrRequiredTitle
