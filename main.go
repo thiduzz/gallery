@@ -47,6 +47,7 @@ func main() {
 	router.HandleFunc("/galleries/{id:[0-9]+}/edit", authenticatedMiddleware.HandleFn(galleriesController.Edit)).Methods(http.MethodGet).Name("gallery.edit")
 	router.HandleFunc("/galleries", authenticatedMiddleware.HandleFn(galleriesController.Store)).Methods(http.MethodPost).Name("gallery.store")
 	router.HandleFunc("/galleries/{id:[0-9]+}/update", authenticatedMiddleware.HandleFn(galleriesController.Update)).Methods(http.MethodPost).Name("gallery.update")
+	router.HandleFunc("/galleries/{id:[0-9]+}/destroy", authenticatedMiddleware.HandleFn(galleriesController.Destroy)).Methods(http.MethodPost).Name("gallery.destroy")
 
 	router.NotFoundHandler = http.HandlerFunc(staticController.NotFound)
 	http.ListenAndServe(":3000",router)

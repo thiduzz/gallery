@@ -5,6 +5,7 @@ import "gorm.io/gorm"
 type GalleryRepository interface {
 	Store(gallery *Gallery) error
 	Update(gallery *Gallery) error
+	Destroy(id uint) error
 	ByID(id uint) (*Gallery, error)
 }
 
@@ -14,6 +15,10 @@ var _ GalleryRepository = &galleryGorm{}
 type galleryGorm struct {
 	db *gorm.DB
 	BaseRepository
+}
+
+func (gg *galleryGorm) Destroy(id uint) error {
+	return gg.db.Delete(&Gallery{}, id).Error
 }
 
 func (gg *galleryGorm) ByID(id uint) (*Gallery, error) {

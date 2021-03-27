@@ -48,6 +48,15 @@ func (gv *galleryValidator) Update(gallery *Gallery) error {
 	return gv.GalleryRepository.Update(gallery)
 }
 
+func (gv *galleryValidator) Destroy(id uint) error {
+	var gallery Gallery
+	gallery.ID = id
+	if id <= 0 {
+		return ErrInvalidID
+	}
+	return gv.GalleryRepository.Destroy(id)
+}
+
 func (gv *galleryValidator) titleRequire(gallery *Gallery) error {
 	if gallery.Title == ""{
 		return ErrRequiredTitle

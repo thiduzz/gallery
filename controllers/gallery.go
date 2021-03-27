@@ -142,3 +142,26 @@ func (c *Galleries) Store(w http.ResponseWriter, r *http.Request)  {
 	}
 	http.Redirect(w, r, url.Path, http.StatusMovedPermanently)
 }
+
+
+func (c *Galleries) Destroy(w http.ResponseWriter, r *http.Request) {
+	gallery, err := c.galleryByID(w, r)
+	if err != nil{
+		return
+	}
+	user := context.User(r.Context())
+	if gallery.UserID != user.ID{
+		http.Error(w, "Gallery not found", http.StatusNotFound)
+		return
+	}
+	var vd views.Data
+	err = c.service.Destroy(gallery.ID)
+	if err != nil{
+		log.Println(err)
+		vd.SetAlert(err)
+		vd.Yield = map[string] interface{}{"type": "edit","gallery": gallery}
+		c.EditView.Render(w,vd)
+		return
+	}
+	http.Redirect(w, r,"/profile", http.StatusFound)
+}
