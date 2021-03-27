@@ -1,0 +1,25 @@
+{{define "yield"}}
+    <main class="bg-white max-w-lg mx-auto p-8 md:p-12 my-10 rounded-lg shadow-2xl">
+        <section class="flex flex-row">
+            <h3 class="font-bold text-2xl mr-4">Galleries for {{.owner.Name}}</h3>
+            <div><a class="text-sm bg-green-500 text-white hover:opacity-75 rounded-lg py-1 px-3" href="/galleries/create">Create</a></div>
+        </section>
+
+        <section class="mt-10">
+            <div class="flex flex-col w-full">
+                {{range .galleries}}
+                    <div class="flex flex-row border border-gray-300 mb-5  shadow-sm">
+                        <div class="w-32 h-32 border-r border-gray-300"></div>
+                        <div class="p-4">
+                            <h2>{{.Title}}</h2>
+                            <div class="inline-block">
+                                <a  class="text-sm bg-blue-500 text-white hover:opacity-75 rounded-lg py-1 px-3" href="/galleries/{{.ID}}">View</a>
+                                <a  class="text-sm bg-blue-500 text-white hover:opacity-75 rounded-lg py-1 px-3" href="/galleries/{{.ID}}/edit">Edit</a>
+                            </div>
+                        </div>
+                    </div>
+                {{end}}
+            </div>
+        </section>
+    </main>
+{{end}}

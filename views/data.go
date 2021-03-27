@@ -1,5 +1,7 @@
 package views
 
+import "github.com/thiduzz/lenslocked.com/models"
+
 const (
 	AlertColorError   = "red"
 	AlertColorSuccess = "green"
@@ -23,6 +25,7 @@ type Alert struct {
 }
 type Data struct {
 	Alert *Alert
+	User *models.User
 	Yield interface{}
 }
 

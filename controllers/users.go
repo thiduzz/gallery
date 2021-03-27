@@ -36,12 +36,11 @@ func NewUsers(us models.UserService) *Users {
 }
 
 func (c *Users) Index(w http.ResponseWriter, r *http.Request)  {
-	c.IndexView.Render(w, nil)
+	c.IndexView.Render(w, r,nil)
 }
 
 func (c *Users) Create(w http.ResponseWriter, r *http.Request)  {
-
-	c.CreateView.Render(w, nil)
+	c.CreateView.Render(w, r,nil)
 }
 
 func (c *Users) Show(w http.ResponseWriter, r *http.Request)  {
@@ -50,7 +49,7 @@ func (c *Users) Show(w http.ResponseWriter, r *http.Request)  {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	c.ShowView.Render(w, email)
+	c.ShowView.Render(w,r,email)
 }
 
 func (c *Users) Login(w http.ResponseWriter, r *http.Request) {
@@ -59,7 +58,7 @@ func (c *Users) Login(w http.ResponseWriter, r *http.Request) {
 	if err := parseForm(r, &form); err != nil{
 		log.Print(err)
 		vd.SetAlert(err)
-		c.IndexView.Render(w,vd)
+		c.IndexView.Render(w,r,vd)
 		return
 	}
 	user, err := c.service.Authenticate(form.Email, form.Password)
@@ -70,14 +69,14 @@ func (c *Users) Login(w http.ResponseWriter, r *http.Request) {
 		default:
 			vd.SetAlert(err)
 		}
-		c.IndexView.Render(w, vd)
+		c.IndexView.Render(w,r,vd)
 		return
 	}
 
 	err = c.signIn(w, user)
 	if err != nil{
 		vd.SetAlert(err)
-		c.IndexView.Render(w, vd)
+		c.IndexView.Render(w,r,vd)
 		return
 	}
 	http.Redirect(w, r,"/profile", http.StatusFound)
@@ -89,7 +88,7 @@ func (c Users) Store(w http.ResponseWriter, r *http.Request)  {
 	if err := parseForm(r, &form); err != nil{
 		log.Print(err)
 		vd.SetAlert(err)
-		c.CreateView.Render(w,vd)
+		c.CreateView.Render(w,r,vd)
 		return
 	}
 	user := models.User{
@@ -101,7 +100,7 @@ func (c Users) Store(w http.ResponseWriter, r *http.Request)  {
 	if err != nil{
 		log.Println(err)
 		vd.SetAlert(err)
-		c.CreateView.Render(w,vd)
+		c.CreateView.Render(w,r,vd)
 	    return
 	}
 	err = c.signIn(w, &user)

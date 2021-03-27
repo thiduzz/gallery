@@ -7,6 +7,7 @@ type GalleryRepository interface {
 	Update(gallery *Gallery) error
 	Destroy(id uint) error
 	ByID(id uint) (*Gallery, error)
+	ByUserID(userId uint) ([]Gallery, error)
 }
 
 
@@ -15,6 +16,12 @@ var _ GalleryRepository = &galleryGorm{}
 type galleryGorm struct {
 	db *gorm.DB
 	BaseRepository
+}
+
+func (gg *galleryGorm) ByUserID(userId uint) ([]Gallery, error) {
+	var galleries []Gallery
+	gg.db.Where("user_id = ?", userId).Find(&galleries)
+	return galleries, nil
 }
 
 func (gg *galleryGorm) Destroy(id uint) error {

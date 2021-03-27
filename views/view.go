@@ -3,6 +3,7 @@ package views
 import (
 	"bytes"
 	"fmt"
+	"github.com/thiduzz/lenslocked.com/context"
 	"html/template"
 	"io"
 	"net/http"
@@ -32,19 +33,21 @@ func NewView(layout string, files ...string) *View {
 	return &View{Template: t, Layout: layout}
 }
 
-func (v *View) Render(w http.ResponseWriter, data interface{}) {
+func (v *View) Render(w http.ResponseWriter, r *http.Request, data interface{}) {
 	w.Header().Set("Content-Type", "text/html")
-
-	switch data.(type) {
+	var vd Data
+	switch d := data.(type) {
 	case Data:
+		vd = d
 	default:
-		data = Data{
+		vd = Data{
 			Alert: nil,
 			Yield: data,
 		}
 	}
+	vd.User = context.User(r.Context())
 	var bf bytes.Buffer
-	if err := v.Template.ExecuteTemplate(&bf, v.Layout, data); err != nil {
+	if err := v.Template.ExecuteTemplate(&bf, v.Layout, vd); err != nil {
 		http.Error(w, "Something went wrong, contact the admins...", http.StatusInternalServerError)
 		return
 	}
@@ -52,7 +55,7 @@ func (v *View) Render(w http.ResponseWriter, data interface{}) {
 }
 
 func (v *View) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	v.Render(writer, nil)
+	v.Render(writer, request,nil)
 }
 
 
