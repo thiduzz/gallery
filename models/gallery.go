@@ -10,7 +10,7 @@ type Gallery struct {
 	Published  bool `gorm:"not null;default:true;"`
 	UserID uint
 	User User `gorm:"not_null;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Photos []Photo
+	Photos []Photo `gorm:"foreignKey:GalleryID;"`
 }
 
 type GalleryService interface {

@@ -9,6 +9,7 @@ import (
 type Services struct {
 	Gallery GalleryService
 	User UserService
+	Photo PhotoService
 	db *gorm.DB
 }
 
@@ -22,12 +23,13 @@ func NewServices(connectionInfo string) (*Services, error) {
 	return &Services{
 		User:    NewUserService(db),
 		Gallery: NewGalleryService(db),
+		Photo: NewPhotoService(db),
 		db: db,
 	}, nil
 }
 
 func (sv *Services) AutoMigrate() error {
-	return sv.db.AutoMigrate(&User{}, &Gallery{})
+	return sv.db.AutoMigrate(&User{}, &Gallery{},  &Photo{})
 }
 
 func (sv *Services) DestructiveReset() error {
