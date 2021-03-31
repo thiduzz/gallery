@@ -1,0 +1,30 @@
+{
+  "name": "lenslocked.com",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:thiduzz/gallery.git",
+  "author": "Thiago <thiduzz14@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "vue": "^3.0.10"
+  },
+  "scripts": {
+    "watch": "webpack --watch",
+    "dev": "webpack-dev-server",
+    "build": "webpack --env.prod"
+  },
+  "devDependencies": {
+    "@vue/compiler-sfc": "^3.0.0-beta.3",
+    "css-loader": "^3.5.2",
+    "file-loader": "^6.0.0",
+    "mini-css-extract-plugin": "^0.9.0",
+    "stylus": "^0.54.7",
+    "stylus-loader": "^3.0.2",
+    "url-loader": "^4.1.0",
+    "vue-loader": "^16.0.0-alpha.3",
+    "vue-style-loader": "^4.1.2",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
+  }
+}

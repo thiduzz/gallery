@@ -35,6 +35,7 @@ func main() {
 	usersController := controllers.NewUsers(services.User)
 	galleriesController := controllers.NewGalleries(services.Gallery, router)
 	photosController := controllers.NewPhotos(services.Photo)
+	router.PathPrefix("/dist/").Handler(http.StripPrefix("/dist/", http.FileServer(http.Dir("dist"))))
 	router.Handle("/", staticController.Home).Methods(http.MethodGet)
 	router.Handle("/contact", staticController.Contact).Methods(http.MethodGet)
 	router.HandleFunc("/signup", usersController.Create).Methods(http.MethodGet)

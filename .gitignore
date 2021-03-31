@@ -2,3 +2,9 @@
 main
 .env
 /.docker/postgresql/data
+
+node_modules
+.DS_Store
+dist
+dist-ssr
+*.local
