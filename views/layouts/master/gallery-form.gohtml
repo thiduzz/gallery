@@ -27,8 +27,7 @@
 {{define "photoForm"}}
 
     <section class="mt-10">
-        <h3>Photos:</h3>
-        <photo-upload gallery-id="{{.gallery.ID}}"></photo-upload>
+        <photo-upload url="/galleries/{{.gallery.ID}}/photos"></photo-upload>
     </section>
 
 {{end}}

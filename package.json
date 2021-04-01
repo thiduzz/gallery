@@ -6,7 +6,9 @@
   "author": "Thiago <thiduzz14@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "vue": "^3.0.10"
+    "axios": "^0.21.1",
+    "vue": "^3.0.10",
+    "vue-axios": "^3.2.4"
   },
   "scripts": {
     "watch": "webpack --watch",
