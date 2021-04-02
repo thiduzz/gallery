@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/thiduzz/lenslocked.com/helpers"
 	"github.com/thiduzz/lenslocked.com/models"
 	"github.com/thiduzz/lenslocked.com/rand"
 	"github.com/thiduzz/lenslocked.com/views"
@@ -55,7 +56,7 @@ func (c *Users) Show(w http.ResponseWriter, r *http.Request)  {
 func (c *Users) Login(w http.ResponseWriter, r *http.Request) {
 	var vd views.Data
 	var form LoginForm
-	if err := parseForm(r, &form); err != nil{
+	if err := helpers.ParseForm(r, &form); err != nil{
 		log.Print(err)
 		vd.SetAlert(err)
 		c.IndexView.Render(w,r,vd)
@@ -85,7 +86,7 @@ func (c *Users) Login(w http.ResponseWriter, r *http.Request) {
 func (c Users) Store(w http.ResponseWriter, r *http.Request)  {
 	var vd views.Data
 	var form RegistrationForm
-	if err := parseForm(r, &form); err != nil{
+	if err := helpers.ParseForm(r, &form); err != nil{
 		log.Print(err)
 		vd.SetAlert(err)
 		c.CreateView.Render(w,r,vd)

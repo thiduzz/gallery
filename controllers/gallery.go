@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/thiduzz/lenslocked.com/context"
+	"github.com/thiduzz/lenslocked.com/helpers"
 	"github.com/thiduzz/lenslocked.com/models"
 	"github.com/thiduzz/lenslocked.com/views"
 	"log"
@@ -110,7 +111,7 @@ func (c *Galleries) Update(w http.ResponseWriter, r *http.Request) {
 	var vd views.Data
 	vd.Yield = map[string] interface{}{"type": "edit","gallery": gallery}
 	var form UpdateForm
-	if err := parseForm(r, &form); err != nil{
+	if err := helpers.ParseForm(r, &form); err != nil{
 		log.Print(err)
 		vd.SetAlert(err)
 		c.EditView.Render(w,r,vd)
@@ -135,7 +136,7 @@ func (c *Galleries) Update(w http.ResponseWriter, r *http.Request) {
 func (c *Galleries) Store(w http.ResponseWriter, r *http.Request)  {
 	var vd views.Data
 	var form StoreForm
-	if err := parseForm(r, &form); err != nil{
+	if err := helpers.ParseForm(r, &form); err != nil{
 		log.Print(err)
 		vd.SetAlert(err)
 		c.CreateView.Render(w,r,vd)

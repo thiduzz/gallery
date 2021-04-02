@@ -4,22 +4,18 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/thiduzz/lenslocked.com/controllers"
+	"github.com/thiduzz/lenslocked.com/helpers"
 	"github.com/thiduzz/lenslocked.com/middleware"
 	"github.com/thiduzz/lenslocked.com/models"
 	"net/http"
+	"os"
 )
 
-const (
-	host = "localhost"
-	port = 5434
-	user = "admin"
-	password = "123456"
-	dbname = "lenslocked"
-)
 
 func main() {
 	router := mux.NewRouter()
-	psqlInfo := fmt.Sprintf("host=%s port=%d password=%s user=%s dbname=%s sslmode=disable", host, port, password, user, dbname)
+	helpers.LoadEnv()
+	psqlInfo := fmt.Sprintf("host=%s port=%s password=%s user=%s dbname=%s sslmode=disable", os.Getenv("POSTGRES_HOST"),  os.Getenv("POSTGRES_PORT"),  os.Getenv("POSTGRES_PASSWORD"),  os.Getenv("POSTGRES_USER"),  os.Getenv("POSTGRES_DB"))
 	services, err := models.NewServices(psqlInfo)
 	if err != nil {
 	    panic(err)

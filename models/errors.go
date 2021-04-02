@@ -16,6 +16,7 @@ const (
 	ErrInvalidPasswordHash privateError = "models: invalid password hash"
 	ErrRememberTooShort privateError = "models: invalid remember token"
 	ErrRequiredRememberHash privateError = "models: remember has in required"
+	ErrUploadFailed privateError = "models: Failed to upload to storage"
 )
 
 type modelError string
