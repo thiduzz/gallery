@@ -10,13 +10,13 @@ const (
 	ErrRequiredPassword modelError = "Password is required"
 	ErrInvalidPassword modelError = "models: invalid password"
 	ErrRequiredTitle modelError = "models: title is required"
+	ErrUploadFailed modelError = "models: Failed to upload to storage"
 
 	ErrInvalidID privateError = "models: ID is invalid"
 	ErrUserIDRequired privateError = "models: user ID is required"
 	ErrInvalidPasswordHash privateError = "models: invalid password hash"
 	ErrRememberTooShort privateError = "models: invalid remember token"
 	ErrRequiredRememberHash privateError = "models: remember has in required"
-	ErrUploadFailed privateError = "models: Failed to upload to storage"
 )
 
 type modelError string

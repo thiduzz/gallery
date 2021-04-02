@@ -6,6 +6,7 @@ import (
 )
 
 const RememberTokenBytes = 32
+const ImageTokenBytes = 32
 
 func Bytes(n int) ([]byte, error) {
 	b := make([]byte, n)
