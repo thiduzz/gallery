@@ -6,6 +6,7 @@ import (
 
 type Gallery struct {
 	gorm.Model
+	ID   uint    `gorm:"column:id; PRIMARY_KEY" json:"id"`
 	Title  string `gorm:"not null;"`
 	Published  bool `gorm:"not null;default:true;"`
 	UserID uint

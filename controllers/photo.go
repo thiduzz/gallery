@@ -43,12 +43,12 @@ func (c *Photos) Store(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 	originalName := header.Filename
 	s3Location := c.getS3Location(originalName, galleryId)
-	filename, err := aws.S3PutObject(file, s3Location)
+	url, err := aws.S3PutObject(file, s3Location)
 	if err != nil{
 		c.NewJsonError(w, err)
 		return
 	}
-	err = c.service.Store(&models.Photo{
+	photoId, err := c.service.Store(&models.Photo{
 		Title:     r.FormValue("subtitle"),
 		Path:      s3Location,
 		GalleryID: uint(galleryId),
@@ -59,7 +59,7 @@ func (c *Photos) Store(w http.ResponseWriter, r *http.Request) {
 		c.NewJsonError(w, err)
 		return
 	}
-	json.NewEncoder(w).Encode(map[string]string{"filename":filename})
+	json.NewEncoder(w).Encode(map[string]string{"id": strconv.Itoa(int(photoId)), "url": url})
 }
 
 

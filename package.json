@@ -8,7 +8,8 @@
   "dependencies": {
     "axios": "^0.21.1",
     "vue": "^3.0.10",
-    "vue-axios": "^3.2.4"
+    "vue-axios": "^3.2.4",
+    "vue-sweetalert2": "^4.2.1"
   },
   "scripts": {
     "watch": "webpack --watch",

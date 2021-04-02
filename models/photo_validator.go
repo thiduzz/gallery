@@ -21,15 +21,6 @@ func validatePhotoRules(photo *Photo, fns ... photoValidationRule) error {
 	return nil
 }
 
-func (gv *photoValidator) Store(photo *Photo) error {
-	if err := validatePhotoRules(photo,
-		gv.titleRequire,
-	); err != nil {
-		return err
-	}
-	return gv.PhotoRepository.Store(photo)
-}
-
 func (gv *photoValidator) Destroy(id uint) error {
 	var gallery Gallery
 	gallery.ID = id

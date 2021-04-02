@@ -42,6 +42,12 @@ func NewAWSConnection() *awsSession {
 	}
 }
 
+func GetBucketPath(filename string) string {
+	region := os.Getenv("AWS_REGION")
+	bucket := os.Getenv("AWS_BUCKET")
+	return "https://" + bucket + "." + "s3-" + region + ".amazonaws.com/" + filename
+}
+
 func (awss *awsSession) S3PutObject(file io.Reader, filename string) (string, error) {
 
 	_, err := awss.s3.Upload(&s3manager.UploadInput{
@@ -53,6 +59,5 @@ func (awss *awsSession) S3PutObject(file io.Reader, filename string) (string, er
 	if err != nil {
 		return "", models.ErrUploadFailed
 	}
-	filepath := "https://" + awss.bucket + "." + "s3-" + awss.region + ".amazonaws.com/" + filename
-	return filepath, nil
+	return GetBucketPath(filename), nil
 }

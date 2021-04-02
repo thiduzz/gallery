@@ -21,32 +21,51 @@
       <button @click="upload" class="bg-purple-600 px-3 hover:bg-purple-700 text-white font-bold py-2 rounded shadow-lg hover:shadow-xl transition duration-200" type="button">Save</button>
     </div>
   </div>
+  <div v-if="photos.length > 0" class="">
+    <PhotoItem v-for="photo in photos" :photo="photo" @delete="deleteUpload"></PhotoItem>
+  </div>
 </template>
 
 <script>
 
+import PhotoItem from "./PhotoItem.vue";
 export default {
+  components: {PhotoItem},
   props:{
-    url: String
+    url: String,
+    currentPhotos: Array
+  },
+  mounted() {
+    this.photos = this.currentPhotos || []
   },
   data() {
     return {
       file: null,
-      subtitle:''
+      subtitle: '',
+      photos: []
     }
   },
   methods: {
     upload() {
-      if(this.file){
+      if(this.file) {
         const formData = new FormData();
         formData.append("image", this.file);
-        formData.append("subtitle",this.subtitle)
+        formData.append("subtitle", this.subtitle)
         this.axios.post(this.url, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
-        })
+        }).then((response) => {
+          this.photos.push(response.data)
+          this.removeUpload()
+        }).catch((e) => {
+          this.$swal({icon:"error",title: "Oops!", text: e.response.data.error});
+        });
       }
+    },
+    deleteUpload(photoId)
+    {
+      alert(photoId)
     },
     removeUpload() {
       this.file = null;
